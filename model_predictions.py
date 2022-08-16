@@ -30,7 +30,6 @@ def multi_var_slinding_time(df, window_size, objetive_var):
 def read_data():
     return pd.read_csv('./data/test_data.csv').set_index('Date')
 
-
 def read_test_data():
     k = 20
     df = read_data()
@@ -38,18 +37,11 @@ def read_test_data():
     return df, y_test.tolist(), k
     
 
-def predict(df_ts_multivar: pd.DataFrame, k: int):
-
-    X_test, y_test = multi_var_slinding_time(df_ts_multivar, k,'daily_emision_CO2_eq')
-
+def predict():
+    k = 20
+    df = read_data()
+    X_test, y_test = multi_var_slinding_time(df, k,'daily_emision_CO2_eq')
     model = load('./model/perceptron.joblib') 
     y_pred = model.predict(X_test)
-    x = df_ts_multivar.index[k:]
-    return y_pred, x
-
-def test(df_ts_multivar: pd.DataFrame, k: int):
-
-    X_test, y_test = multi_var_slinding_time(df_ts_multivar, k,'daily_emision_CO2_eq')
-    x = df_ts_multivar.index[k:]
-
-    return df_ts_multivar,x , y_test
+    x = df.reset_index()['Date'].to_list()
+    return y_pred.tolist(), x[k:]

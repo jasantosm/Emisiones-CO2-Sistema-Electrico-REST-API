@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from fastapi import status
 import numpy as np
 
-from model_predictions import read_test_data
+from model_predictions import read_test_data, predict
 
 app = FastAPI()
 
@@ -25,12 +25,17 @@ class Test_data(BaseModel):
     test_data: List[Data]
     y_test: List[float]
     k: int
+
+class Predict_data(BaseModel):
+    y_pred: List[float]
+    x: List[str]
     
 
-@app.get("/model/prediction/k", response_model=List[Data], status_code=status.HTTP_200_OK)
-def get_prediction_data(k: int, test_data: List[Data]):
+@app.get("/model/prediction/", response_model=Predict_data, status_code=status.HTTP_200_OK)
+def get_prediction_data():
 
-    return test_data
+    y_pred, x = predict()
+    return {'y_pred': y_pred, 'x': x}
 
 @app.get("/model/data/test/", response_model=Test_data, status_code=status.HTTP_200_OK)
 def get_test_data():
