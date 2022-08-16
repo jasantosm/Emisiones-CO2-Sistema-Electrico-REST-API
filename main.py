@@ -1,7 +1,11 @@
+import re
 from fastapi import FastAPI
-from typing import List
+from typing import List, Dict
 from pydantic import BaseModel
 from fastapi import status
+import numpy as np
+
+from model_predictions import read_test_data
 
 app = FastAPI()
 
@@ -17,11 +21,22 @@ class Data(BaseModel):
     daily_precio_bolsa: float
     daily_emision_CO2_eq: float
 
+class Test_data(BaseModel):
+    test_data: List[Data]
+    y_test: List[float]
+    k: int
+    
 
-
-@app.get("/model/k", response_model=List[Data], status_code=status.HTTP_200_OK)
-def get_prediction(k: int, test_data: List[Data]):
-
-
+@app.get("/model/prediction/k", response_model=List[Data], status_code=status.HTTP_200_OK)
+def get_prediction_data(k: int, test_data: List[Data]):
 
     return test_data
+
+@app.get("/model/data/test/", response_model=Test_data, status_code=status.HTTP_200_OK)
+def get_test_data():
+
+    data, y_test, k = read_test_data()
+
+    data = data.reset_index()
+
+    return {'test_data':data.to_dict(orient='records'), 'y_test':y_test, 'k': k}
